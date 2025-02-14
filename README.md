@@ -7,7 +7,7 @@
 2. Install dependencies:
 
    ```bash
-   cd likwid-margin-bot
+   cd likwid-margin-example
    npm install
    ```
 
