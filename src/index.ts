@@ -262,8 +262,14 @@ async function main() {
     console.error("Increase Margin Sell failed:", error);
   }
 
+  const maxDecrease = await contracts.marginPositionManager.getMaxDecrease(positionId);
+
   // Decrease Margin Sell
   const decreaseAmount = -increaseAmount;
+  if (decreaseAmount < -maxDecrease) {
+    console.error("Decrease amount is too large");
+    return;
+  }
   try {
     const tx = await contracts.marginPositionManager.modify(positionId, decreaseAmount);
     await tx.wait();
