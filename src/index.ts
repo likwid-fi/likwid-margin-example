@@ -1,51 +1,56 @@
 import dotenv from "dotenv";
 import { ContractRunner, ethers } from "ethers";
 import { ERC20__factory } from "./types/contracts/factories/ERC20__factory";
-import { MarginHookManager__factory } from "./types/contracts/factories/MarginHookManager__factory";
+import { PoolManager__factory } from "./types/contracts/factories/PoolManager__factory";
+import { PairPoolManager__factory } from "./types/contracts/factories/PairPoolManager__factory";
+import { LendingPoolManager__factory } from "./types/contracts/factories/LendingPoolManager__factory";
 import { MarginPositionManager__factory } from "./types/contracts/factories/MarginPositionManager__factory";
 import { MarginChecker__factory } from "./types/contracts/factories/MarginChecker__factory";
 import { MarginRouter__factory } from "./types/contracts/factories/MarginRouter__factory";
 import { MarginLiquidity__factory } from "./types/contracts/factories/MarginLiquidity__factory";
+import type { PoolKeyStruct, PoolManager } from "./types/contracts/PoolManager";
+import type { LendingPoolManager } from "./types/contracts/LendingPoolManager";
 import type {
-  PoolKeyStruct,
+  PairPoolManager,
   AddLiquidityParamsStruct,
-  MarginHookManager,
   RemoveLiquidityParamsStruct,
-} from "./types/contracts/MarginHookManager";
-import type {
-  MarginPositionManager,
-  MarginParamsStruct,
-  BurnParamsStruct,
-} from "./types/contracts/MarginPositionManager";
+} from "./types/contracts/PairPoolManager";
+import type { MarginPositionManager, MarginParamsStruct } from "./types/contracts/MarginPositionManager";
 import type { MarginChecker } from "./types/contracts/MarginChecker";
 import type { MarginRouter } from "./types/contracts/MarginRouter";
 
 interface ContractAddresses {
+  poolManager: string; // Uniswap PoolManager
+  pairPoolManager: string;
+  lendingPoolManager: string;
   marginChecker: string;
-  marginHookManager: string;
   marginPositionManager: string;
   marginRouter: string;
+  marginHook: string;
 }
 
 interface Contracts {
+  poolManager: PoolManager;
+  pairPoolManager: PairPoolManager;
+  lendingPoolManager: LendingPoolManager;
   marginChecker: MarginChecker;
-  marginHookManager: MarginHookManager;
   marginPositionManager: MarginPositionManager;
   marginRouter: MarginRouter;
 }
 
 async function initializeContracts(addresses: ContractAddresses, runner: ContractRunner): Promise<Contracts> {
+  const poolManager = PoolManager__factory.connect(addresses.poolManager, runner);
+  const pairPoolManager = PairPoolManager__factory.connect(addresses.pairPoolManager, runner);
+  const lendingPoolManager = LendingPoolManager__factory.connect(addresses.lendingPoolManager, runner);
   const marginChecker = MarginChecker__factory.connect(addresses.marginChecker, runner);
-
-  const marginHookManager = MarginHookManager__factory.connect(addresses.marginHookManager, runner);
-
   const marginPositionManager = MarginPositionManager__factory.connect(addresses.marginPositionManager, runner);
-
   const marginRouter = MarginRouter__factory.connect(addresses.marginRouter, runner);
 
   return {
+    poolManager,
+    pairPoolManager,
+    lendingPoolManager,
     marginChecker,
-    marginHookManager,
     marginPositionManager,
     marginRouter,
   };
@@ -60,14 +65,17 @@ async function main() {
   const provider = new ethers.JsonRpcProvider(rpcUrl);
   const wallet = new ethers.Wallet(privateKey, provider);
   const addresses: ContractAddresses = {
-    marginHookManager: "0xAeC3B6Af00ACA8E5dE1a5222C7b07766659D0888",
-    marginPositionManager: "0x2064b9C6D3baDa53FE305eA5fDdF26056b3aBf4e",
-    marginChecker: "0xc3C1D0f7919aBdb52047206D40767DAbFaC454eA",
-    marginRouter: "0x73Ddf6643b8DFDd0cDBE1C83394448a040E1eA0c",
+    poolManager: "0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    pairPoolManager: "0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    lendingPoolManager: "0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    marginPositionManager: "0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    marginChecker: "0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    marginRouter: "0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    marginHook: "0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
   };
   const contracts = await initializeContracts(addresses, wallet);
   const user = wallet.address;
-  console.log("user:", user);
+  console.log("user.address:", user);
   const ethAddress = "0x0000000000000000000000000000000000000000"; // ETH
   const tokenAddress = "0x8B099F91C710Ce9E5EE5b7F2E83db9bAc3378975"; // LIKWID
   const tokenContract = ERC20__factory.connect(tokenAddress, wallet);
@@ -76,7 +84,7 @@ async function main() {
     currency1: tokenAddress,
     fee: 3000, // 0.3%
     tickSpacing: 1,
-    hooks: addresses.marginHookManager,
+    hooks: addresses.marginHook,
   };
   const encodedData = ethers.AbiCoder.defaultAbiCoder().encode(
     ["address", "address", "uint24", "int24", "address"],
@@ -85,18 +93,19 @@ async function main() {
   const poolId = ethers.keccak256(encodedData);
   try {
     // initialize pool
-    const tx = await contracts.marginHookManager.initialize(poolKey);
+    const sqrtPriceX96_1_1 = 79228162514264337593543950336n;
+    const tx = await contracts.poolManager.initialize(poolKey, sqrtPriceX96_1_1);
     await tx.wait();
-    console.log("Margin hook manager initialized.tx hash:", tx.hash);
+    console.log("Uniswap PoolManager initialized.tx hash:", tx.hash);
   } catch (error) {
     // There are multiple possible reasons for failure: 1, the pool has already been initialized; 2, currency0 >= currency1; 3, other reasons.
-    console.error("Margin hook manager initialization failed:", error);
+    console.error("Uniswap PoolManager initialization failed:", error);
   }
 
   console.log("poolId:", poolId);
-  const status = await contracts.marginHookManager.getStatus(poolId);
+  const status = await contracts.pairPoolManager.getStatus(poolId);
   console.log("status:", status);
-  const reserves = await contracts.marginHookManager.getReserves(poolId);
+  const reserves = await contracts.pairPoolManager.getReserves(poolId);
   console.log("reserves:", reserves);
   // Add liquidity proportionally
   const amount0In = ethers.parseEther("0.01");
@@ -113,22 +122,20 @@ async function main() {
     poolId: poolId,
     amount0: amount0In,
     amount1: amount1In,
-    tickLower: 50000,
-    tickUpper: 50000,
     level: 4,
     to: user,
     deadline: Math.floor(Date.now() / 1000) + 100,
   };
   // approve token
-  await (await tokenContract.approve(addresses.marginHookManager, amount1In)).wait();
+  await (await tokenContract.approve(addresses.pairPoolManager, amount1In)).wait();
   try {
-    const tx = await contracts.marginHookManager.addLiquidity(addLiquidityParams, { value: amount0In });
+    const tx = await contracts.pairPoolManager.addLiquidity(addLiquidityParams, { value: amount0In });
     await tx.wait();
     console.log("Margin hook manager addLiquidity succeed.tx hash:", tx.hash);
   } catch (error) {
     console.error("Margin hook manager addLiquidity failed:", error);
   }
-  const liquidityAddress = await contracts.marginHookManager.marginLiquidity();
+  const liquidityAddress = await contracts.pairPoolManager.marginLiquidity();
   console.log("liquidityAddress:", liquidityAddress);
   const liquidityContract = MarginLiquidity__factory.connect(liquidityAddress, wallet);
   const lpPoolId = await liquidityContract.getPoolId(poolId);
@@ -143,7 +150,7 @@ async function main() {
     deadline: Math.floor(Date.now() / 1000) + 100,
   };
   try {
-    const tx = await contracts.marginHookManager.removeLiquidity(removeLiquidityParams);
+    const tx = await contracts.pairPoolManager.removeLiquidity(removeLiquidityParams);
     await tx.wait();
     console.log("Margin hook manager removeLiquidity succeed.tx hash:", tx.hash);
   } catch (error) {
@@ -154,21 +161,16 @@ async function main() {
   let marginForOne = false; // If true, currency1 is marginToken, otherwise currency2 is marginToken
   const marginSellAmount = ethers.parseEther("0.001");
   const leverage = 1n; // Multiple 1~5, does not support decimals.
-  let marginTotalParams = await contracts.marginPositionManager.getMarginTotal(
-    poolId,
-    marginForOne,
-    leverage,
-    marginSellAmount
-  );
+
+  let borrowAmount = await contracts.pairPoolManager.getAmountIn(poolId, marginForOne, marginSellAmount * leverage);
+
   const marginSellParams: MarginParamsStruct = {
     poolId: poolId,
     marginForOne: marginForOne,
     leverage: leverage,
     marginAmount: marginSellAmount,
-    marginTotal: marginTotalParams.marginWithoutFee,
-    borrowAmount: marginTotalParams.borrowAmount,
-    borrowMinAmount: (marginTotalParams.borrowAmount * 995n) / 1000n, // 0.5% Slippage
-    recipient: user,
+    borrowAmount: borrowAmount,
+    borrowMaxAmount: (borrowAmount * 1005n) / 1000n, // 0.5% Slippage
     deadline: Math.floor(Date.now() / 1000) + 100,
   };
   try {
@@ -184,21 +186,14 @@ async function main() {
   const marginBuyAmount = ethers.parseEther("1000");
   // approve position token
   await (await tokenContract.approve(addresses.marginPositionManager, marginBuyAmount)).wait();
-  marginTotalParams = await contracts.marginPositionManager.getMarginTotal(
-    poolId,
-    marginForOne,
-    leverage,
-    marginBuyAmount
-  );
+  borrowAmount = await contracts.pairPoolManager.getAmountIn(poolId, marginForOne, marginBuyAmount * leverage);
   const marginBuyParams: MarginParamsStruct = {
     poolId: poolId,
     marginForOne: marginForOne,
     leverage: leverage,
     marginAmount: marginBuyAmount,
-    marginTotal: marginTotalParams.marginWithoutFee,
-    borrowAmount: marginTotalParams.borrowAmount,
-    borrowMinAmount: (marginTotalParams.borrowAmount * 995n) / 1000n, // 0.5% Slippage
-    recipient: user,
+    borrowAmount: borrowAmount,
+    borrowMaxAmount: (borrowAmount * 1005n) / 1000n, // 0.5% Slippage
     deadline: Math.floor(Date.now() / 1000) + 100,
   };
   try {
@@ -211,13 +206,13 @@ async function main() {
 
   // Repay Margin Sell
   marginForOne = false;
-  let positionId = await contracts.marginPositionManager.getPositionId(poolId, marginForOne, user);
+  let positionId = await contracts.marginPositionManager.getPositionId(poolId, marginForOne, user, true);
   console.log("Margin Sell positionId:", positionId);
   let sellPosition = await contracts.marginPositionManager.getPosition(positionId);
-  const repayAmount = sellPosition.borrowAmount / 2n; // 还一半
+  const repayAmount = sellPosition.borrowAmount / 2n;
   console.log("Before repay borrowAmount", sellPosition.borrowAmount);
   // approve token
-  await (await tokenContract.approve(addresses.marginHookManager, repayAmount)).wait();
+  await (await tokenContract.approve(addresses.pairPoolManager, repayAmount)).wait();
   let deadline = Math.floor(Date.now() / 1000) + 100;
   try {
     const tx = await contracts.marginPositionManager.repay(positionId, repayAmount, deadline);
@@ -231,7 +226,7 @@ async function main() {
 
   // Close Margin Buy
   marginForOne = true;
-  positionId = await contracts.marginPositionManager.getPositionId(poolId, marginForOne, user);
+  positionId = await contracts.marginPositionManager.getPositionId(poolId, marginForOne, user, true);
   console.log("Margin Buy positionId:", positionId);
   let buyPosition = await contracts.marginPositionManager.getPosition(positionId);
   console.log("Before close borrowAmount", buyPosition.borrowAmount);
@@ -248,9 +243,50 @@ async function main() {
   buyPosition = await contracts.marginPositionManager.getPosition(positionId);
   console.log("After close borrowAmount", buyPosition.borrowAmount);
 
+  // Borrow LIKWID
+  marginForOne = false;
+  const borrowMarginAmount = ethers.parseEther("0.001");
+  borrowAmount = await contracts.pairPoolManager.getAmountOut(poolId, !marginForOne, borrowMarginAmount); // this is smaller than max borrow amount
+  const borrowParams: MarginParamsStruct = {
+    poolId: poolId,
+    marginForOne: marginForOne,
+    leverage: 0,
+    marginAmount: borrowMarginAmount,
+    borrowAmount: borrowAmount,
+    borrowMaxAmount: (borrowAmount * 1005n) / 1000n, // 0.5% Slippage
+    deadline: Math.floor(Date.now() / 1000) + 100,
+  };
+  try {
+    const tx = await contracts.marginPositionManager.margin(borrowParams);
+    await tx.wait();
+    console.log("Margin Buy succeed.tx hash:", tx.hash);
+  } catch (error) {
+    console.error("Margin Buy failed:", error);
+  }
+
+  // Repay Borrow
+  marginForOne = false;
+  positionId = await contracts.marginPositionManager.getPositionId(poolId, marginForOne, user, false);
+  console.log("Margin Sell positionId:", positionId);
+  let borrowPosition = await contracts.marginPositionManager.getPosition(positionId);
+  const repayBorrowAmount = sellPosition.borrowAmount / 2n;
+  console.log("Before repay borrowAmount", borrowPosition.borrowAmount);
+  // approve token
+  await (await tokenContract.approve(addresses.pairPoolManager, repayBorrowAmount)).wait();
+  deadline = Math.floor(Date.now() / 1000) + 100;
+  try {
+    const tx = await contracts.marginPositionManager.repay(positionId, repayBorrowAmount, deadline);
+    tx.wait();
+    console.log("Repay Borrow succeed.tx hash:", tx.hash);
+  } catch (error) {
+    console.error("Repay Borrow failed:", error);
+  }
+  borrowPosition = await contracts.marginPositionManager.getPosition(positionId);
+  console.log("After repay borrowAmount", borrowPosition.borrowAmount);
+
   // Increase Margin Sell
   marginForOne = false;
-  positionId = await contracts.marginPositionManager.getPositionId(poolId, marginForOne, user);
+  positionId = await contracts.marginPositionManager.getPositionId(poolId, marginForOne, user, true);
   console.log("Margin Sell positionId:", positionId);
   const increaseAmount = ethers.parseEther("0.001");
   deadline = Math.floor(Date.now() / 1000) + 100;
@@ -262,9 +298,12 @@ async function main() {
     console.error("Increase Margin Sell failed:", error);
   }
 
-  const maxDecrease = await contracts.marginPositionManager.getMaxDecrease(positionId);
-
   // Decrease Margin Sell
+  const maxDecrease = await contracts.marginChecker["getMaxDecrease(address,uint256)"](
+    addresses.marginPositionManager,
+    positionId
+  );
+
   const decreaseAmount = -increaseAmount;
   if (decreaseAmount < -maxDecrease) {
     console.error("Decrease amount is too large");
@@ -278,9 +317,43 @@ async function main() {
     console.error("Decrease Margin Sell failed:", error);
   }
 
+  // LendingPool deposit
+  const depositAmount = ethers.parseEther("0.001");
+  try {
+    const tx = await contracts.lendingPoolManager["deposit(address,bytes32,address,uint256)"](
+      user,
+      poolId,
+      ethAddress,
+      depositAmount,
+      { value: depositAmount }
+    );
+    await tx.wait();
+    console.log("LendingPool deposit eth succeed.tx hash:", tx.hash);
+  } catch (error) {
+    console.error("LendingPool deposit eth failed:", error);
+  }
+
+  // LendingPool balanceOf
+  const typesToEncode = ["address", "bytes32"];
+  const valuesToEncode = [ethAddress, poolId];
+  const idEncodedData = ethers.AbiCoder.defaultAbiCoder().encode(typesToEncode, valuesToEncode);
+  const hash = ethers.keccak256(idEncodedData);
+  const tokenId = ethers.toBigInt(hash);
+  const lendingTokenBalance = await contracts.lendingPoolManager.balanceOf(user, tokenId);
+  console.log("lendingTokenBalance:", lendingTokenBalance);
+
+  // LendingPool withdraw
+  try {
+    const tx = await contracts.lendingPoolManager.withdraw(user, poolId, ethAddress, depositAmount);
+    await tx.wait();
+    console.log("LendingPool withdraw eth succeed.tx hash:", tx.hash);
+  } catch (error) {
+    console.error("LendingPool withdraw eth failed:", error);
+  }
+
   // Swap Buy Token
   const swapAmountInETH = ethers.parseEther("0.001");
-  const amountOut = await contracts.marginHookManager.getAmountOut(poolId, true, swapAmountInETH);
+  const amountOut = await contracts.pairPoolManager.getAmountOut(poolId, true, swapAmountInETH);
   console.log("Swap Buy Token amountOut:", amountOut);
   let swapParams: MarginRouter.SwapParamsStruct = {
     poolId: poolId,

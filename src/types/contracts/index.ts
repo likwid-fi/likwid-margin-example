@@ -2,15 +2,19 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { ERC20 } from "./ERC20";
+export type { LendingPoolManager } from "./LendingPoolManager";
 export type { MarginChecker } from "./MarginChecker";
-export type { MarginHookManager } from "./MarginHookManager";
 export type { MarginLiquidity } from "./MarginLiquidity";
 export type { MarginPositionManager } from "./MarginPositionManager";
 export type { MarginRouter } from "./MarginRouter";
+export type { PairPoolManager } from "./PairPoolManager";
+export type { PoolManager } from "./PoolManager";
 export * as factories from "./factories";
 export { ERC20__factory } from "./factories/ERC20__factory";
+export { LendingPoolManager__factory } from "./factories/LendingPoolManager__factory";
 export { MarginChecker__factory } from "./factories/MarginChecker__factory";
-export { MarginHookManager__factory } from "./factories/MarginHookManager__factory";
 export { MarginLiquidity__factory } from "./factories/MarginLiquidity__factory";
 export { MarginPositionManager__factory } from "./factories/MarginPositionManager__factory";
 export { MarginRouter__factory } from "./factories/MarginRouter__factory";
+export { PairPoolManager__factory } from "./factories/PairPoolManager__factory";
+export { PoolManager__factory } from "./factories/PoolManager__factory";

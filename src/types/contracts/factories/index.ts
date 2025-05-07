@@ -2,8 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 export { ERC20__factory } from "./ERC20__factory";
+export { LendingPoolManager__factory } from "./LendingPoolManager__factory";
 export { MarginChecker__factory } from "./MarginChecker__factory";
-export { MarginHookManager__factory } from "./MarginHookManager__factory";
 export { MarginLiquidity__factory } from "./MarginLiquidity__factory";
 export { MarginPositionManager__factory } from "./MarginPositionManager__factory";
 export { MarginRouter__factory } from "./MarginRouter__factory";
+export { PairPoolManager__factory } from "./PairPoolManager__factory";
+export { PoolManager__factory } from "./PoolManager__factory";
