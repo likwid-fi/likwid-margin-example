@@ -122,6 +122,8 @@ async function main() {
     poolId: poolId,
     amount0: amount0In,
     amount1: amount1In,
+    amount0Min: (amount0In * 995n) / 1000n,
+    amount1Min: (amount1In * 995n) / 1000n,
     level: 4,
     to: user,
     deadline: Math.floor(Date.now() / 1000) + 100,
@@ -139,12 +141,14 @@ async function main() {
   console.log("liquidityAddress:", liquidityAddress);
   const liquidityContract = MarginLiquidity__factory.connect(liquidityAddress, wallet);
   const lpPoolId = await liquidityContract.getPoolId(poolId);
-  const levelPoolId = await liquidityContract.getLevelPool(lpPoolId, 4);
+  const levelPoolId = lpPoolId + 4n;
   const liquidity = await liquidityContract.balanceOf(user, levelPoolId);
   console.log("liquidity:", liquidity);
   // remove liquidity
   const removeLiquidityParams: RemoveLiquidityParamsStruct = {
     poolId: poolId,
+    amount0Min: 0n,
+    amount1Min: 0n,
     level: 4,
     liquidity: liquidity / 10n,
     deadline: Math.floor(Date.now() / 1000) + 100,
@@ -171,6 +175,7 @@ async function main() {
     marginAmount: marginSellAmount,
     borrowAmount: borrowAmount,
     borrowMaxAmount: (borrowAmount * 1005n) / 1000n, // 0.5% Slippage
+    recipient: user,
     deadline: Math.floor(Date.now() / 1000) + 100,
   };
   try {
@@ -194,6 +199,7 @@ async function main() {
     marginAmount: marginBuyAmount,
     borrowAmount: borrowAmount,
     borrowMaxAmount: (borrowAmount * 1005n) / 1000n, // 0.5% Slippage
+    recipient: user,
     deadline: Math.floor(Date.now() / 1000) + 100,
   };
   try {
@@ -254,6 +260,7 @@ async function main() {
     marginAmount: borrowMarginAmount,
     borrowAmount: borrowAmount,
     borrowMaxAmount: (borrowAmount * 1005n) / 1000n, // 0.5% Slippage
+    recipient: user,
     deadline: Math.floor(Date.now() / 1000) + 100,
   };
   try {
@@ -360,8 +367,9 @@ async function main() {
     zeroForOne: true,
     amountIn: swapAmountInETH,
     amountOutMin: (amountOut * 995n) / 1000n, // 0.5% Slippage
-    to: user,
     amountOut: 0n,
+    amountInMax: 0,
+    to: user,
     deadline: Math.floor(Date.now() / 1000) + 100,
   };
   try {
@@ -379,8 +387,9 @@ async function main() {
     zeroForOne: false,
     amountIn: swapAmountInToken,
     amountOutMin: 0n, // Swap regardless of the amount
-    to: user,
     amountOut: 0n,
+    amountInMax: 0n,
+    to: user,
     deadline: Math.floor(Date.now() / 1000) + 100,
   };
   // approve token

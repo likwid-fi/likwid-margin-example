@@ -23,28 +23,115 @@ import type {
   TypedContractMethod,
 } from "./common";
 
+export type PoolKeyStruct = {
+  currency0: AddressLike;
+  currency1: AddressLike;
+  fee: BigNumberish;
+  tickSpacing: BigNumberish;
+  hooks: AddressLike;
+};
+
+export type PoolKeyStructOutput = [
+  currency0: string,
+  currency1: string,
+  fee: bigint,
+  tickSpacing: bigint,
+  hooks: string
+] & {
+  currency0: string;
+  currency1: string;
+  fee: bigint;
+  tickSpacing: bigint;
+  hooks: string;
+};
+
+export type PoolStatusStruct = {
+  blockTimestampLast: BigNumberish;
+  realReserve0: BigNumberish;
+  realReserve1: BigNumberish;
+  mirrorReserve0: BigNumberish;
+  mirrorReserve1: BigNumberish;
+  marginFee: BigNumberish;
+  lendingRealReserve0: BigNumberish;
+  lendingRealReserve1: BigNumberish;
+  lendingMirrorReserve0: BigNumberish;
+  lendingMirrorReserve1: BigNumberish;
+  truncatedReserve0: BigNumberish;
+  truncatedReserve1: BigNumberish;
+  rate0CumulativeLast: BigNumberish;
+  rate1CumulativeLast: BigNumberish;
+  key: PoolKeyStruct;
+};
+
+export type PoolStatusStructOutput = [
+  blockTimestampLast: bigint,
+  realReserve0: bigint,
+  realReserve1: bigint,
+  mirrorReserve0: bigint,
+  mirrorReserve1: bigint,
+  marginFee: bigint,
+  lendingRealReserve0: bigint,
+  lendingRealReserve1: bigint,
+  lendingMirrorReserve0: bigint,
+  lendingMirrorReserve1: bigint,
+  truncatedReserve0: bigint,
+  truncatedReserve1: bigint,
+  rate0CumulativeLast: bigint,
+  rate1CumulativeLast: bigint,
+  key: PoolKeyStructOutput
+] & {
+  blockTimestampLast: bigint;
+  realReserve0: bigint;
+  realReserve1: bigint;
+  mirrorReserve0: bigint;
+  mirrorReserve1: bigint;
+  marginFee: bigint;
+  lendingRealReserve0: bigint;
+  lendingRealReserve1: bigint;
+  lendingMirrorReserve0: bigint;
+  lendingMirrorReserve1: bigint;
+  truncatedReserve0: bigint;
+  truncatedReserve1: bigint;
+  rate0CumulativeLast: bigint;
+  rate1CumulativeLast: bigint;
+  key: PoolKeyStructOutput;
+};
+
 export interface MarginLiquidityInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | "LP_FLAG"
-      | "addHooks"
+      | "accruesRatioX112Of"
+      | "addInterests"
       | "addLiquidity"
+      | "addPoolManager"
       | "allowance"
+      | "allowanceOriginal"
       | "approve"
       | "balanceOf"
-      | "burn"
-      | "getLevelPool"
+      | "balanceOriginal"
+      | "changeLiquidity"
+      | "datetimeStore"
+      | "getFlowReserves"
+      | "getInterestReserves(address,bytes32,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)))"
+      | "getInterestReserves(address,bytes32)"
+      | "getMarginReserves(address,bytes32,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)))"
+      | "getMarginReserves(address,bytes32)"
+      | "getMaxSliding"
       | "getPoolId"
       | "getPoolLiquidities"
+      | "getPoolLiquidity"
       | "getPoolSupplies"
       | "getSupplies"
-      | "hooks"
+      | "increaseStore"
+      | "interestOperator"
+      | "interestStore0"
+      | "interestStore1"
       | "isOperator"
-      | "mint"
-      | "mintFee"
+      | "minHoldingDuration"
       | "owner"
-      | "protocolRatio"
+      | "poolManagers"
       | "removeLiquidity"
+      | "setMaxSliding"
       | "setOperator"
       | "supportsInterface"
       | "transfer"
@@ -60,17 +147,28 @@ export interface MarginLiquidityInterface extends Interface {
       | "Transfer"
   ): EventFragment;
 
-  encodeFunctionData(functionFragment: "LP_FLAG", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "addHooks",
-    values: [AddressLike]
+    functionFragment: "accruesRatioX112Of",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "addInterests",
+    values: [BytesLike, BigNumberish, BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "addLiquidity",
-    values: [AddressLike, BigNumberish, BigNumberish, BigNumberish]
+    values: [AddressLike, AddressLike, BigNumberish, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "addPoolManager",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "allowance",
+    values: [AddressLike, AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "allowanceOriginal",
     values: [AddressLike, AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
@@ -82,12 +180,40 @@ export interface MarginLiquidityInterface extends Interface {
     values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "burn",
-    values: [AddressLike, BigNumberish, BigNumberish]
+    functionFragment: "balanceOriginal",
+    values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getLevelPool",
-    values: [BigNumberish, BigNumberish]
+    functionFragment: "changeLiquidity",
+    values: [BytesLike, BigNumberish, BigNumberish, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "datetimeStore",
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getFlowReserves",
+    values: [AddressLike, BytesLike, PoolStatusStruct]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getInterestReserves(address,bytes32,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)))",
+    values: [AddressLike, BytesLike, PoolStatusStruct]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getInterestReserves(address,bytes32)",
+    values: [AddressLike, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getMarginReserves(address,bytes32,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)))",
+    values: [AddressLike, BytesLike, PoolStatusStruct]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getMarginReserves(address,bytes32)",
+    values: [AddressLike, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getMaxSliding",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getPoolId",
@@ -98,6 +224,10 @@ export interface MarginLiquidityInterface extends Interface {
     values: [BytesLike, AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "getPoolLiquidity",
+    values: [BytesLike, AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getPoolSupplies",
     values: [AddressLike, BytesLike]
   ): string;
@@ -105,33 +235,42 @@ export interface MarginLiquidityInterface extends Interface {
     functionFragment: "getSupplies",
     values: [BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "hooks", values: [AddressLike]): string;
+  encodeFunctionData(
+    functionFragment: "increaseStore",
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "interestOperator",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "interestStore0",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "interestStore1",
+    values: [BytesLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "isOperator",
     values: [AddressLike, AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "mint",
-    values: [AddressLike, BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "mintFee",
-    values: [
-      AddressLike,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish
-    ]
+    functionFragment: "minHoldingDuration",
+    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "protocolRatio",
-    values?: undefined
+    functionFragment: "poolManagers",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "removeLiquidity",
     values: [AddressLike, BigNumberish, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setMaxSliding",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "setOperator",
@@ -154,23 +293,72 @@ export interface MarginLiquidityInterface extends Interface {
     values: [AddressLike]
   ): string;
 
-  decodeFunctionResult(functionFragment: "LP_FLAG", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "addHooks", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "accruesRatioX112Of",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "addInterests",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "addLiquidity",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "addPoolManager",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "allowanceOriginal",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getLevelPool",
+    functionFragment: "balanceOriginal",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "changeLiquidity",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "datetimeStore",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getFlowReserves",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getInterestReserves(address,bytes32,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)))",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getInterestReserves(address,bytes32)",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getMarginReserves(address,bytes32,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)))",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getMarginReserves(address,bytes32)",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getMaxSliding",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getPoolId", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getPoolLiquidities",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getPoolLiquidity",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -181,17 +369,38 @@ export interface MarginLiquidityInterface extends Interface {
     functionFragment: "getSupplies",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "hooks", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "increaseStore",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "interestOperator",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "interestStore0",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "interestStore1",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "isOperator", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "mintFee", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "minHoldingDuration",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "protocolRatio",
+    functionFragment: "poolManagers",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "removeLiquidity",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setMaxSliding",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -344,17 +553,38 @@ export interface MarginLiquidity extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  LP_FLAG: TypedContractMethod<[], [bigint], "view">;
+  accruesRatioX112Of: TypedContractMethod<
+    [arg0: BigNumberish],
+    [bigint],
+    "view"
+  >;
 
-  addHooks: TypedContractMethod<[_hook: AddressLike], [void], "nonpayable">;
+  addInterests: TypedContractMethod<
+    [
+      poolId: BytesLike,
+      _reserve0: BigNumberish,
+      _reserve1: BigNumberish,
+      interest0: BigNumberish,
+      interest1: BigNumberish
+    ],
+    [bigint],
+    "nonpayable"
+  >;
 
   addLiquidity: TypedContractMethod<
     [
+      caller: AddressLike,
       receiver: AddressLike,
       id: BigNumberish,
       level: BigNumberish,
       amount: BigNumberish
     ],
+    [void],
+    "nonpayable"
+  >;
+
+  addPoolManager: TypedContractMethod<
+    [_manager: AddressLike],
     [void],
     "nonpayable"
   >;
@@ -365,8 +595,14 @@ export interface MarginLiquidity extends BaseContract {
     "view"
   >;
 
+  allowanceOriginal: TypedContractMethod<
+    [arg0: AddressLike, arg1: AddressLike, arg2: BigNumberish],
+    [bigint],
+    "view"
+  >;
+
   approve: TypedContractMethod<
-    [spender: AddressLike, id: BigNumberish, amount: BigNumberish],
+    [spender: AddressLike, id: BigNumberish, _amount: BigNumberish],
     [boolean],
     "nonpayable"
   >;
@@ -377,17 +613,75 @@ export interface MarginLiquidity extends BaseContract {
     "view"
   >;
 
-  burn: TypedContractMethod<
-    [sender: AddressLike, id: BigNumberish, amount: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
-
-  getLevelPool: TypedContractMethod<
-    [uPoolId: BigNumberish, level: BigNumberish],
+  balanceOriginal: TypedContractMethod<
+    [arg0: AddressLike, arg1: BigNumberish],
     [bigint],
     "view"
   >;
+
+  changeLiquidity: TypedContractMethod<
+    [
+      poolId: BytesLike,
+      _reserve0: BigNumberish,
+      _reserve1: BigNumberish,
+      interest0: BigNumberish,
+      interest1: BigNumberish
+    ],
+    [bigint],
+    "nonpayable"
+  >;
+
+  datetimeStore: TypedContractMethod<
+    [arg0: AddressLike, arg1: BigNumberish],
+    [bigint],
+    "view"
+  >;
+
+  getFlowReserves: TypedContractMethod<
+    [pairPoolManager: AddressLike, poolId: BytesLike, status: PoolStatusStruct],
+    [[bigint, bigint] & { reserve0: bigint; reserve1: bigint }],
+    "view"
+  >;
+
+  "getInterestReserves(address,bytes32,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)))": TypedContractMethod<
+    [pairPoolManager: AddressLike, poolId: BytesLike, status: PoolStatusStruct],
+    [[bigint, bigint] & { reserve0: bigint; reserve1: bigint }],
+    "view"
+  >;
+
+  "getInterestReserves(address,bytes32)": TypedContractMethod<
+    [pairPoolManager: AddressLike, poolId: BytesLike],
+    [[bigint, bigint] & { reserve0: bigint; reserve1: bigint }],
+    "view"
+  >;
+
+  "getMarginReserves(address,bytes32,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)))": TypedContractMethod<
+    [pairPoolManager: AddressLike, poolId: BytesLike, status: PoolStatusStruct],
+    [
+      [bigint, bigint, bigint, bigint] & {
+        marginReserve0: bigint;
+        marginReserve1: bigint;
+        incrementMaxMirror0: bigint;
+        incrementMaxMirror1: bigint;
+      }
+    ],
+    "view"
+  >;
+
+  "getMarginReserves(address,bytes32)": TypedContractMethod<
+    [pairPoolManager: AddressLike, poolId: BytesLike],
+    [
+      [bigint, bigint, bigint, bigint] & {
+        marginReserve0: bigint;
+        marginReserve1: bigint;
+        incrementMaxMirror0: bigint;
+        incrementMaxMirror1: bigint;
+      }
+    ],
+    "view"
+  >;
+
+  getMaxSliding: TypedContractMethod<[], [bigint], "view">;
 
   getPoolId: TypedContractMethod<[poolId: BytesLike], [bigint], "view">;
 
@@ -397,8 +691,14 @@ export interface MarginLiquidity extends BaseContract {
     "view"
   >;
 
+  getPoolLiquidity: TypedContractMethod<
+    [poolId: BytesLike, owner: AddressLike, level: BigNumberish],
+    [bigint],
+    "view"
+  >;
+
   getPoolSupplies: TypedContractMethod<
-    [hook: AddressLike, poolId: BytesLike],
+    [poolManager: AddressLike, poolId: BytesLike],
     [
       [bigint, bigint, bigint] & {
         totalSupply: bigint;
@@ -421,35 +721,29 @@ export interface MarginLiquidity extends BaseContract {
     "view"
   >;
 
-  hooks: TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
+  increaseStore: TypedContractMethod<
+    [arg0: AddressLike, arg1: BigNumberish],
+    [bigint],
+    "view"
+  >;
+
+  interestOperator: TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
+
+  interestStore0: TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
+
+  interestStore1: TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
 
   isOperator: TypedContractMethod<
-    [owner: AddressLike, operator: AddressLike],
+    [arg0: AddressLike, arg1: AddressLike],
     [boolean],
     "view"
   >;
 
-  mint: TypedContractMethod<
-    [receiver: AddressLike, id: BigNumberish, amount: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
-
-  mintFee: TypedContractMethod<
-    [
-      feeTo: AddressLike,
-      _kLast: BigNumberish,
-      uPoolId: BigNumberish,
-      _reserve0: BigNumberish,
-      _reserve1: BigNumberish
-    ],
-    [boolean],
-    "nonpayable"
-  >;
+  minHoldingDuration: TypedContractMethod<[], [bigint], "view">;
 
   owner: TypedContractMethod<[], [string], "view">;
 
-  protocolRatio: TypedContractMethod<[], [bigint], "view">;
+  poolManagers: TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
 
   removeLiquidity: TypedContractMethod<
     [
@@ -458,6 +752,12 @@ export interface MarginLiquidity extends BaseContract {
       level: BigNumberish,
       amount: BigNumberish
     ],
+    [bigint],
+    "nonpayable"
+  >;
+
+  setMaxSliding: TypedContractMethod<
+    [_maxSliding: BigNumberish],
     [void],
     "nonpayable"
   >;
@@ -475,7 +775,7 @@ export interface MarginLiquidity extends BaseContract {
   >;
 
   transfer: TypedContractMethod<
-    [receiver: AddressLike, id: BigNumberish, amount: BigNumberish],
+    [receiver: AddressLike, id: BigNumberish, _amount: BigNumberish],
     [boolean],
     "nonpayable"
   >;
@@ -485,7 +785,7 @@ export interface MarginLiquidity extends BaseContract {
       sender: AddressLike,
       receiver: AddressLike,
       id: BigNumberish,
-      amount: BigNumberish
+      _amount: BigNumberish
     ],
     [boolean],
     "nonpayable"
@@ -502,15 +802,26 @@ export interface MarginLiquidity extends BaseContract {
   ): T;
 
   getFunction(
-    nameOrSignature: "LP_FLAG"
-  ): TypedContractMethod<[], [bigint], "view">;
+    nameOrSignature: "accruesRatioX112Of"
+  ): TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
   getFunction(
-    nameOrSignature: "addHooks"
-  ): TypedContractMethod<[_hook: AddressLike], [void], "nonpayable">;
+    nameOrSignature: "addInterests"
+  ): TypedContractMethod<
+    [
+      poolId: BytesLike,
+      _reserve0: BigNumberish,
+      _reserve1: BigNumberish,
+      interest0: BigNumberish,
+      interest1: BigNumberish
+    ],
+    [bigint],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "addLiquidity"
   ): TypedContractMethod<
     [
+      caller: AddressLike,
       receiver: AddressLike,
       id: BigNumberish,
       level: BigNumberish,
@@ -520,6 +831,9 @@ export interface MarginLiquidity extends BaseContract {
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "addPoolManager"
+  ): TypedContractMethod<[_manager: AddressLike], [void], "nonpayable">;
+  getFunction(
     nameOrSignature: "allowance"
   ): TypedContractMethod<
     [owner: AddressLike, spender: AddressLike, id: BigNumberish],
@@ -527,9 +841,16 @@ export interface MarginLiquidity extends BaseContract {
     "view"
   >;
   getFunction(
+    nameOrSignature: "allowanceOriginal"
+  ): TypedContractMethod<
+    [arg0: AddressLike, arg1: AddressLike, arg2: BigNumberish],
+    [bigint],
+    "view"
+  >;
+  getFunction(
     nameOrSignature: "approve"
   ): TypedContractMethod<
-    [spender: AddressLike, id: BigNumberish, amount: BigNumberish],
+    [spender: AddressLike, id: BigNumberish, _amount: BigNumberish],
     [boolean],
     "nonpayable"
   >;
@@ -541,19 +862,84 @@ export interface MarginLiquidity extends BaseContract {
     "view"
   >;
   getFunction(
-    nameOrSignature: "burn"
+    nameOrSignature: "balanceOriginal"
   ): TypedContractMethod<
-    [sender: AddressLike, id: BigNumberish, amount: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "getLevelPool"
-  ): TypedContractMethod<
-    [uPoolId: BigNumberish, level: BigNumberish],
+    [arg0: AddressLike, arg1: BigNumberish],
     [bigint],
     "view"
   >;
+  getFunction(
+    nameOrSignature: "changeLiquidity"
+  ): TypedContractMethod<
+    [
+      poolId: BytesLike,
+      _reserve0: BigNumberish,
+      _reserve1: BigNumberish,
+      interest0: BigNumberish,
+      interest1: BigNumberish
+    ],
+    [bigint],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "datetimeStore"
+  ): TypedContractMethod<
+    [arg0: AddressLike, arg1: BigNumberish],
+    [bigint],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getFlowReserves"
+  ): TypedContractMethod<
+    [pairPoolManager: AddressLike, poolId: BytesLike, status: PoolStatusStruct],
+    [[bigint, bigint] & { reserve0: bigint; reserve1: bigint }],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getInterestReserves(address,bytes32,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)))"
+  ): TypedContractMethod<
+    [pairPoolManager: AddressLike, poolId: BytesLike, status: PoolStatusStruct],
+    [[bigint, bigint] & { reserve0: bigint; reserve1: bigint }],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getInterestReserves(address,bytes32)"
+  ): TypedContractMethod<
+    [pairPoolManager: AddressLike, poolId: BytesLike],
+    [[bigint, bigint] & { reserve0: bigint; reserve1: bigint }],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getMarginReserves(address,bytes32,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)))"
+  ): TypedContractMethod<
+    [pairPoolManager: AddressLike, poolId: BytesLike, status: PoolStatusStruct],
+    [
+      [bigint, bigint, bigint, bigint] & {
+        marginReserve0: bigint;
+        marginReserve1: bigint;
+        incrementMaxMirror0: bigint;
+        incrementMaxMirror1: bigint;
+      }
+    ],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getMarginReserves(address,bytes32)"
+  ): TypedContractMethod<
+    [pairPoolManager: AddressLike, poolId: BytesLike],
+    [
+      [bigint, bigint, bigint, bigint] & {
+        marginReserve0: bigint;
+        marginReserve1: bigint;
+        incrementMaxMirror0: bigint;
+        incrementMaxMirror1: bigint;
+      }
+    ],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getMaxSliding"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "getPoolId"
   ): TypedContractMethod<[poolId: BytesLike], [bigint], "view">;
@@ -565,9 +951,16 @@ export interface MarginLiquidity extends BaseContract {
     "view"
   >;
   getFunction(
+    nameOrSignature: "getPoolLiquidity"
+  ): TypedContractMethod<
+    [poolId: BytesLike, owner: AddressLike, level: BigNumberish],
+    [bigint],
+    "view"
+  >;
+  getFunction(
     nameOrSignature: "getPoolSupplies"
   ): TypedContractMethod<
-    [hook: AddressLike, poolId: BytesLike],
+    [poolManager: AddressLike, poolId: BytesLike],
     [
       [bigint, bigint, bigint] & {
         totalSupply: bigint;
@@ -591,41 +984,37 @@ export interface MarginLiquidity extends BaseContract {
     "view"
   >;
   getFunction(
-    nameOrSignature: "hooks"
+    nameOrSignature: "increaseStore"
+  ): TypedContractMethod<
+    [arg0: AddressLike, arg1: BigNumberish],
+    [bigint],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "interestOperator"
   ): TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "interestStore0"
+  ): TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "interestStore1"
+  ): TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "isOperator"
   ): TypedContractMethod<
-    [owner: AddressLike, operator: AddressLike],
+    [arg0: AddressLike, arg1: AddressLike],
     [boolean],
     "view"
   >;
   getFunction(
-    nameOrSignature: "mint"
-  ): TypedContractMethod<
-    [receiver: AddressLike, id: BigNumberish, amount: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "mintFee"
-  ): TypedContractMethod<
-    [
-      feeTo: AddressLike,
-      _kLast: BigNumberish,
-      uPoolId: BigNumberish,
-      _reserve0: BigNumberish,
-      _reserve1: BigNumberish
-    ],
-    [boolean],
-    "nonpayable"
-  >;
+    nameOrSignature: "minHoldingDuration"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "owner"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: "protocolRatio"
-  ): TypedContractMethod<[], [bigint], "view">;
+    nameOrSignature: "poolManagers"
+  ): TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
   getFunction(
     nameOrSignature: "removeLiquidity"
   ): TypedContractMethod<
@@ -635,9 +1024,12 @@ export interface MarginLiquidity extends BaseContract {
       level: BigNumberish,
       amount: BigNumberish
     ],
-    [void],
+    [bigint],
     "nonpayable"
   >;
+  getFunction(
+    nameOrSignature: "setMaxSliding"
+  ): TypedContractMethod<[_maxSliding: BigNumberish], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "setOperator"
   ): TypedContractMethod<
@@ -651,7 +1043,7 @@ export interface MarginLiquidity extends BaseContract {
   getFunction(
     nameOrSignature: "transfer"
   ): TypedContractMethod<
-    [receiver: AddressLike, id: BigNumberish, amount: BigNumberish],
+    [receiver: AddressLike, id: BigNumberish, _amount: BigNumberish],
     [boolean],
     "nonpayable"
   >;
@@ -662,7 +1054,7 @@ export interface MarginLiquidity extends BaseContract {
       sender: AddressLike,
       receiver: AddressLike,
       id: BigNumberish,
-      amount: BigNumberish
+      _amount: BigNumberish
     ],
     [boolean],
     "nonpayable"

@@ -143,27 +143,24 @@ export interface MarginCheckerInterface extends Interface {
       | "checkLiquidate(address,uint256[])"
       | "checkMinMarginLevel"
       | "checkValidity"
-      | "estimatePNL(address,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),(bytes32,bool,uint128,uint128,uint128,uint128,uint256),uint256)"
-      | "estimatePNL(address,uint256,uint256)"
-      | "getBorrowMax"
+      | "estimatePNL"
       | "getLiquidateRepayAmount((uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),bool,uint256)"
       | "getLiquidateRepayAmount(address,uint256)"
-      | "getMarginMax"
       | "getMaxDecrease(address,uint256)"
       | "getMaxDecrease(address,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),(bytes32,bool,uint128,uint128,uint128,uint128,uint256))"
       | "getPositions"
       | "getProfitMillions"
       | "getReserves"
-      | "getThousandthsByLeverage"
       | "liquidationMarginLevel"
       | "liquidationRatio"
+      | "maxLeverage"
       | "minBorrowLevel"
       | "minMarginLevel"
       | "owner"
       | "setCallerProfit"
-      | "setLeverageParts"
       | "setLiquidationMarginLevel"
       | "setLiquidationRatio"
+      | "setMaxLeverage"
       | "setMinBorrowLevel"
       | "setMinMarginLevel"
       | "setProtocolProfit"
@@ -171,7 +168,9 @@ export interface MarginCheckerInterface extends Interface {
       | "updatePosition"
   ): FunctionFragment;
 
-  getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
+  getEvent(
+    nameOrSignatureOrTopic: "OwnershipTransferred" | "StateChanged"
+  ): EventFragment;
 
   encodeFunctionData(
     functionFragment: "checkLiquidate(address,uint256)",
@@ -200,16 +199,8 @@ export interface MarginCheckerInterface extends Interface {
     values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "estimatePNL(address,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),(bytes32,bool,uint128,uint128,uint128,uint128,uint256),uint256)",
-    values: [AddressLike, PoolStatusStruct, MarginPositionStruct, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "estimatePNL(address,uint256,uint256)",
+    functionFragment: "estimatePNL",
     values: [AddressLike, BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getBorrowMax",
-    values: [AddressLike, BytesLike, boolean, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getLiquidateRepayAmount((uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),bool,uint256)",
@@ -218,10 +209,6 @@ export interface MarginCheckerInterface extends Interface {
   encodeFunctionData(
     functionFragment: "getLiquidateRepayAmount(address,uint256)",
     values: [AddressLike, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getMarginMax",
-    values: [AddressLike, BytesLike, boolean, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getMaxDecrease(address,uint256)",
@@ -244,15 +231,15 @@ export interface MarginCheckerInterface extends Interface {
     values: [AddressLike, BytesLike, boolean]
   ): string;
   encodeFunctionData(
-    functionFragment: "getThousandthsByLeverage",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "liquidationMarginLevel",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "liquidationRatio",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "maxLeverage",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -269,15 +256,15 @@ export interface MarginCheckerInterface extends Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "setLeverageParts",
-    values: [BigNumberish[]]
-  ): string;
-  encodeFunctionData(
     functionFragment: "setLiquidationMarginLevel",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "setLiquidationRatio",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setMaxLeverage",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -322,15 +309,7 @@ export interface MarginCheckerInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "estimatePNL(address,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),(bytes32,bool,uint128,uint128,uint128,uint128,uint256),uint256)",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "estimatePNL(address,uint256,uint256)",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getBorrowMax",
+    functionFragment: "estimatePNL",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -339,10 +318,6 @@ export interface MarginCheckerInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getLiquidateRepayAmount(address,uint256)",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getMarginMax",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -366,15 +341,15 @@ export interface MarginCheckerInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getThousandthsByLeverage",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "liquidationMarginLevel",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "liquidationRatio",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "maxLeverage",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -391,15 +366,15 @@ export interface MarginCheckerInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setLeverageParts",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "setLiquidationMarginLevel",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "setLiquidationRatio",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setMaxLeverage",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -430,6 +405,24 @@ export namespace OwnershipTransferredEvent {
   export interface OutputObject {
     user: string;
     newOwner: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace StateChangedEvent {
+  export type InputTuple = [
+    name: string,
+    oldValue: BigNumberish,
+    newValue: BigNumberish
+  ];
+  export type OutputTuple = [name: string, oldValue: bigint, newValue: bigint];
+  export interface OutputObject {
+    name: string;
+    oldValue: bigint;
+    newValue: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -525,35 +518,13 @@ export interface MarginChecker extends BaseContract {
     "view"
   >;
 
-  "estimatePNL(address,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),(bytes32,bool,uint128,uint128,uint128,uint128,uint256),uint256)": TypedContractMethod<
-    [
-      pairPoolManager: AddressLike,
-      _status: PoolStatusStruct,
-      _position: MarginPositionStruct,
-      closeMillionth: BigNumberish
-    ],
-    [bigint],
-    "view"
-  >;
-
-  "estimatePNL(address,uint256,uint256)": TypedContractMethod<
+  estimatePNL: TypedContractMethod<
     [
       positionManager: AddressLike,
       positionId: BigNumberish,
       closeMillionth: BigNumberish
     ],
     [bigint],
-    "view"
-  >;
-
-  getBorrowMax: TypedContractMethod<
-    [
-      _poolManager: AddressLike,
-      poolId: BytesLike,
-      marginForOne: boolean,
-      marginAmount: BigNumberish
-    ],
-    [[bigint, bigint] & { marginAmountIn: bigint; borrowMax: bigint }],
     "view"
   >;
 
@@ -570,17 +541,6 @@ export interface MarginChecker extends BaseContract {
   "getLiquidateRepayAmount(address,uint256)": TypedContractMethod<
     [manager: AddressLike, positionId: BigNumberish],
     [bigint],
-    "view"
-  >;
-
-  getMarginMax: TypedContractMethod<
-    [
-      _poolManager: AddressLike,
-      poolId: BytesLike,
-      marginForOne: boolean,
-      leverage: BigNumberish
-    ],
-    [[bigint, bigint] & { marginMax: bigint; borrowAmount: bigint }],
     "view"
   >;
 
@@ -614,11 +574,11 @@ export interface MarginChecker extends BaseContract {
     "view"
   >;
 
-  getThousandthsByLeverage: TypedContractMethod<[], [bigint[]], "view">;
-
   liquidationMarginLevel: TypedContractMethod<[], [bigint], "view">;
 
   liquidationRatio: TypedContractMethod<[], [bigint], "view">;
+
+  maxLeverage: TypedContractMethod<[], [bigint], "view">;
 
   minBorrowLevel: TypedContractMethod<[], [bigint], "view">;
 
@@ -632,12 +592,6 @@ export interface MarginChecker extends BaseContract {
     "nonpayable"
   >;
 
-  setLeverageParts: TypedContractMethod<
-    [_leverageThousandths: BigNumberish[]],
-    [void],
-    "nonpayable"
-  >;
-
   setLiquidationMarginLevel: TypedContractMethod<
     [_liquidationMarginLevel: BigNumberish],
     [void],
@@ -646,6 +600,12 @@ export interface MarginChecker extends BaseContract {
 
   setLiquidationRatio: TypedContractMethod<
     [_liquidationRatio: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  setMaxLeverage: TypedContractMethod<
+    [_maxLeverage: BigNumberish],
     [void],
     "nonpayable"
   >;
@@ -735,19 +695,7 @@ export interface MarginChecker extends BaseContract {
     "view"
   >;
   getFunction(
-    nameOrSignature: "estimatePNL(address,(uint32,uint112,uint112,uint112,uint112,uint24,uint112,uint112,uint112,uint112,uint112,uint112,uint256,uint256,(address,address,uint24,int24,address)),(bytes32,bool,uint128,uint128,uint128,uint128,uint256),uint256)"
-  ): TypedContractMethod<
-    [
-      pairPoolManager: AddressLike,
-      _status: PoolStatusStruct,
-      _position: MarginPositionStruct,
-      closeMillionth: BigNumberish
-    ],
-    [bigint],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "estimatePNL(address,uint256,uint256)"
+    nameOrSignature: "estimatePNL"
   ): TypedContractMethod<
     [
       positionManager: AddressLike,
@@ -755,18 +703,6 @@ export interface MarginChecker extends BaseContract {
       closeMillionth: BigNumberish
     ],
     [bigint],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "getBorrowMax"
-  ): TypedContractMethod<
-    [
-      _poolManager: AddressLike,
-      poolId: BytesLike,
-      marginForOne: boolean,
-      marginAmount: BigNumberish
-    ],
-    [[bigint, bigint] & { marginAmountIn: bigint; borrowMax: bigint }],
     "view"
   >;
   getFunction(
@@ -785,18 +721,6 @@ export interface MarginChecker extends BaseContract {
   ): TypedContractMethod<
     [manager: AddressLike, positionId: BigNumberish],
     [bigint],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "getMarginMax"
-  ): TypedContractMethod<
-    [
-      _poolManager: AddressLike,
-      poolId: BytesLike,
-      marginForOne: boolean,
-      leverage: BigNumberish
-    ],
-    [[bigint, bigint] & { marginMax: bigint; borrowAmount: bigint }],
     "view"
   >;
   getFunction(
@@ -835,13 +759,13 @@ export interface MarginChecker extends BaseContract {
     "view"
   >;
   getFunction(
-    nameOrSignature: "getThousandthsByLeverage"
-  ): TypedContractMethod<[], [bigint[]], "view">;
-  getFunction(
     nameOrSignature: "liquidationMarginLevel"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "liquidationRatio"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "maxLeverage"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "minBorrowLevel"
@@ -856,13 +780,6 @@ export interface MarginChecker extends BaseContract {
     nameOrSignature: "setCallerProfit"
   ): TypedContractMethod<[_callerProfit: BigNumberish], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: "setLeverageParts"
-  ): TypedContractMethod<
-    [_leverageThousandths: BigNumberish[]],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
     nameOrSignature: "setLiquidationMarginLevel"
   ): TypedContractMethod<
     [_liquidationMarginLevel: BigNumberish],
@@ -876,6 +793,9 @@ export interface MarginChecker extends BaseContract {
     [void],
     "nonpayable"
   >;
+  getFunction(
+    nameOrSignature: "setMaxLeverage"
+  ): TypedContractMethod<[_maxLeverage: BigNumberish], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "setMinBorrowLevel"
   ): TypedContractMethod<[_minBorrowLevel: BigNumberish], [void], "nonpayable">;
@@ -903,6 +823,13 @@ export interface MarginChecker extends BaseContract {
     OwnershipTransferredEvent.OutputTuple,
     OwnershipTransferredEvent.OutputObject
   >;
+  getEvent(
+    key: "StateChanged"
+  ): TypedContractEvent<
+    StateChangedEvent.InputTuple,
+    StateChangedEvent.OutputTuple,
+    StateChangedEvent.OutputObject
+  >;
 
   filters: {
     "OwnershipTransferred(address,address)": TypedContractEvent<
@@ -914,6 +841,17 @@ export interface MarginChecker extends BaseContract {
       OwnershipTransferredEvent.InputTuple,
       OwnershipTransferredEvent.OutputTuple,
       OwnershipTransferredEvent.OutputObject
+    >;
+
+    "StateChanged(string,uint24,uint24)": TypedContractEvent<
+      StateChangedEvent.InputTuple,
+      StateChangedEvent.OutputTuple,
+      StateChangedEvent.OutputObject
+    >;
+    StateChanged: TypedContractEvent<
+      StateChangedEvent.InputTuple,
+      StateChangedEvent.OutputTuple,
+      StateChangedEvent.OutputObject
     >;
   };
 }

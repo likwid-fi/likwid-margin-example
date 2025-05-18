@@ -58,6 +58,7 @@ export type MarginParamsStruct = {
   marginAmount: BigNumberish;
   borrowAmount: BigNumberish;
   borrowMaxAmount: BigNumberish;
+  recipient: AddressLike;
   deadline: BigNumberish;
 };
 
@@ -68,6 +69,7 @@ export type MarginParamsStructOutput = [
   marginAmount: bigint,
   borrowAmount: bigint,
   borrowMaxAmount: bigint,
+  recipient: string,
   deadline: bigint
 ] & {
   poolId: string;
@@ -76,6 +78,7 @@ export type MarginParamsStructOutput = [
   marginAmount: bigint;
   borrowAmount: bigint;
   borrowMaxAmount: bigint;
+  recipient: string;
   deadline: bigint;
 };
 

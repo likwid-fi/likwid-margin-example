@@ -27,6 +27,8 @@ export type AddLiquidityParamsStruct = {
   poolId: BytesLike;
   amount0: BigNumberish;
   amount1: BigNumberish;
+  amount0Min: BigNumberish;
+  amount1Min: BigNumberish;
   level: BigNumberish;
   to: AddressLike;
   deadline: BigNumberish;
@@ -36,6 +38,8 @@ export type AddLiquidityParamsStructOutput = [
   poolId: string,
   amount0: bigint,
   amount1: bigint,
+  amount0Min: bigint,
+  amount1Min: bigint,
   level: bigint,
   to: string,
   deadline: bigint
@@ -43,6 +47,8 @@ export type AddLiquidityParamsStructOutput = [
   poolId: string;
   amount0: bigint;
   amount1: bigint;
+  amount0Min: bigint;
+  amount1Min: bigint;
   level: bigint;
   to: string;
   deadline: bigint;
@@ -129,6 +135,7 @@ export type MarginParamsStruct = {
   marginAmount: BigNumberish;
   borrowAmount: BigNumberish;
   borrowMaxAmount: BigNumberish;
+  recipient: AddressLike;
   deadline: BigNumberish;
 };
 
@@ -139,6 +146,7 @@ export type MarginParamsStructOutput = [
   marginAmount: bigint,
   borrowAmount: bigint,
   borrowMaxAmount: bigint,
+  recipient: string,
   deadline: bigint
 ] & {
   poolId: string;
@@ -147,6 +155,7 @@ export type MarginParamsStructOutput = [
   marginAmount: bigint;
   borrowAmount: bigint;
   borrowMaxAmount: bigint;
+  recipient: string;
   deadline: bigint;
 };
 
@@ -204,6 +213,8 @@ export type RemoveLiquidityParamsStruct = {
   poolId: BytesLike;
   level: BigNumberish;
   liquidity: BigNumberish;
+  amount0Min: BigNumberish;
+  amount1Min: BigNumberish;
   deadline: BigNumberish;
 };
 
@@ -211,8 +222,17 @@ export type RemoveLiquidityParamsStructOutput = [
   poolId: string,
   level: bigint,
   liquidity: bigint,
+  amount0Min: bigint,
+  amount1Min: bigint,
   deadline: bigint
-] & { poolId: string; level: bigint; liquidity: bigint; deadline: bigint };
+] & {
+  poolId: string;
+  level: bigint;
+  liquidity: bigint;
+  amount0Min: bigint;
+  amount1Min: bigint;
+  deadline: bigint;
+};
 
 export declare namespace IPoolManager {
   export type SwapParamsStruct = {
@@ -264,7 +284,6 @@ export interface PairPoolManagerInterface extends Interface {
       | "removePositionManager"
       | "setBalances"
       | "setHooks"
-      | "setMarginFees"
       | "setStatusManager"
       | "statusManager"
       | "swap"
@@ -281,6 +300,7 @@ export interface PairPoolManagerInterface extends Interface {
       | "Mint"
       | "OwnershipTransferred"
       | "Release"
+      | "Swap"
   ): EventFragment;
 
   encodeFunctionData(
@@ -394,10 +414,6 @@ export interface PairPoolManagerInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "setMarginFees",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(
     functionFragment: "setStatusManager",
     values: [AddressLike]
   ): string;
@@ -411,7 +427,7 @@ export interface PairPoolManagerInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "swapMirror",
-    values: [AddressLike, AddressLike, BytesLike, boolean, BigNumberish]
+    values: [AddressLike, BytesLike, boolean, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "transferOwnership",
@@ -514,10 +530,6 @@ export interface PairPoolManagerInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setHooks", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "setMarginFees",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "setStatusManager",
     data: BytesLike
@@ -699,6 +711,40 @@ export namespace ReleaseEvent {
     repayAmount: bigint;
     burnAmount: bigint;
     rawBorrowAmount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace SwapEvent {
+  export type InputTuple = [
+    poolId: BytesLike,
+    sender: AddressLike,
+    amount0: BigNumberish,
+    amount1: BigNumberish,
+    fee: BigNumberish,
+    zeroForOne: boolean,
+    feeAmount: BigNumberish
+  ];
+  export type OutputTuple = [
+    poolId: string,
+    sender: string,
+    amount0: bigint,
+    amount1: bigint,
+    fee: bigint,
+    zeroForOne: boolean,
+    feeAmount: bigint
+  ];
+  export interface OutputObject {
+    poolId: string;
+    sender: string;
+    amount0: bigint;
+    amount1: bigint;
+    fee: bigint;
+    zeroForOne: boolean;
+    feeAmount: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -921,12 +967,6 @@ export interface PairPoolManager extends BaseContract {
 
   setHooks: TypedContractMethod<[_hooks: AddressLike], [void], "nonpayable">;
 
-  setMarginFees: TypedContractMethod<
-    [_marginFees: AddressLike],
-    [void],
-    "nonpayable"
-  >;
-
   setStatusManager: TypedContractMethod<
     [_poolStatusManager: AddressLike],
     [void],
@@ -955,11 +995,11 @@ export interface PairPoolManager extends BaseContract {
 
   swapMirror: TypedContractMethod<
     [
-      sender: AddressLike,
       recipient: AddressLike,
       poolId: BytesLike,
       zeroForOne: boolean,
-      amountIn: BigNumberish
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish
     ],
     [bigint],
     "payable"
@@ -1179,9 +1219,6 @@ export interface PairPoolManager extends BaseContract {
     nameOrSignature: "setHooks"
   ): TypedContractMethod<[_hooks: AddressLike], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: "setMarginFees"
-  ): TypedContractMethod<[_marginFees: AddressLike], [void], "nonpayable">;
-  getFunction(
     nameOrSignature: "setStatusManager"
   ): TypedContractMethod<
     [_poolStatusManager: AddressLike],
@@ -1214,11 +1251,11 @@ export interface PairPoolManager extends BaseContract {
     nameOrSignature: "swapMirror"
   ): TypedContractMethod<
     [
-      sender: AddressLike,
       recipient: AddressLike,
       poolId: BytesLike,
       zeroForOne: boolean,
-      amountIn: BigNumberish
+      amountIn: BigNumberish,
+      amountOutMin: BigNumberish
     ],
     [bigint],
     "payable"
@@ -1271,6 +1308,13 @@ export interface PairPoolManager extends BaseContract {
     ReleaseEvent.InputTuple,
     ReleaseEvent.OutputTuple,
     ReleaseEvent.OutputObject
+  >;
+  getEvent(
+    key: "Swap"
+  ): TypedContractEvent<
+    SwapEvent.InputTuple,
+    SwapEvent.OutputTuple,
+    SwapEvent.OutputObject
   >;
 
   filters: {
@@ -1338,6 +1382,17 @@ export interface PairPoolManager extends BaseContract {
       ReleaseEvent.InputTuple,
       ReleaseEvent.OutputTuple,
       ReleaseEvent.OutputObject
+    >;
+
+    "Swap(bytes32,address,uint256,uint256,uint24,bool,uint256)": TypedContractEvent<
+      SwapEvent.InputTuple,
+      SwapEvent.OutputTuple,
+      SwapEvent.OutputObject
+    >;
+    Swap: TypedContractEvent<
+      SwapEvent.InputTuple,
+      SwapEvent.OutputTuple,
+      SwapEvent.OutputObject
     >;
   };
 }

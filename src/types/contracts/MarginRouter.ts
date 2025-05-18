@@ -31,6 +31,7 @@ export declare namespace MarginRouter {
     amountIn: BigNumberish;
     amountOutMin: BigNumberish;
     amountOut: BigNumberish;
+    amountInMax: BigNumberish;
     deadline: BigNumberish;
   };
 
@@ -41,6 +42,7 @@ export declare namespace MarginRouter {
     amountIn: bigint,
     amountOutMin: bigint,
     amountOut: bigint,
+    amountInMax: bigint,
     deadline: bigint
   ] & {
     poolId: string;
@@ -49,6 +51,7 @@ export declare namespace MarginRouter {
     amountIn: bigint;
     amountOutMin: bigint;
     amountOut: bigint;
+    amountInMax: bigint;
     deadline: bigint;
   };
 }
@@ -59,8 +62,8 @@ export interface MarginRouterInterface extends Interface {
       | "exactInput"
       | "exactOutput"
       | "handelSwap"
-      | "hook"
       | "owner"
+      | "pairPoolManager"
       | "poolManager"
       | "transferOwnership"
       | "unlockCallback"
@@ -80,10 +83,13 @@ export interface MarginRouterInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "handelSwap",
-    values: [AddressLike, MarginRouter.SwapParamsStruct]
+    values: [AddressLike, BigNumberish, MarginRouter.SwapParamsStruct]
   ): string;
-  encodeFunctionData(functionFragment: "hook", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "pairPoolManager",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "poolManager",
     values?: undefined
@@ -103,8 +109,11 @@ export interface MarginRouterInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "handelSwap", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "hook", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "pairPoolManager",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "poolManager",
     data: BytesLike
@@ -216,14 +225,18 @@ export interface MarginRouter extends BaseContract {
   >;
 
   handelSwap: TypedContractMethod<
-    [sender: AddressLike, params: MarginRouter.SwapParamsStruct],
+    [
+      sender: AddressLike,
+      msgValue: BigNumberish,
+      params: MarginRouter.SwapParamsStruct
+    ],
     [bigint],
     "nonpayable"
   >;
 
-  hook: TypedContractMethod<[], [string], "view">;
-
   owner: TypedContractMethod<[], [string], "view">;
+
+  pairPoolManager: TypedContractMethod<[], [string], "view">;
 
   poolManager: TypedContractMethod<[], [string], "view">;
 
@@ -260,15 +273,19 @@ export interface MarginRouter extends BaseContract {
   getFunction(
     nameOrSignature: "handelSwap"
   ): TypedContractMethod<
-    [sender: AddressLike, params: MarginRouter.SwapParamsStruct],
+    [
+      sender: AddressLike,
+      msgValue: BigNumberish,
+      params: MarginRouter.SwapParamsStruct
+    ],
     [bigint],
     "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "hook"
+    nameOrSignature: "owner"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: "owner"
+    nameOrSignature: "pairPoolManager"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "poolManager"
