@@ -722,7 +722,7 @@ export interface LendingPoolManager extends BaseContract {
   >;
 
   approve: TypedContractMethod<
-    [spender: AddressLike, id: BigNumberish, amount: BigNumberish],
+    [spender: AddressLike, id: BigNumberish, _amount: BigNumberish],
     [boolean],
     "nonpayable"
   >;
@@ -825,7 +825,7 @@ export interface LendingPoolManager extends BaseContract {
       currency: AddressLike,
       amount: BigNumberish
     ],
-    [void],
+    [bigint],
     "nonpayable"
   >;
 
@@ -918,7 +918,7 @@ export interface LendingPoolManager extends BaseContract {
   totalSupply: TypedContractMethod<[id: BigNumberish], [bigint], "view">;
 
   transfer: TypedContractMethod<
-    [receiver: AddressLike, id: BigNumberish, amount: BigNumberish],
+    [receiver: AddressLike, id: BigNumberish, _amount: BigNumberish],
     [boolean],
     "nonpayable"
   >;
@@ -928,7 +928,7 @@ export interface LendingPoolManager extends BaseContract {
       sender: AddressLike,
       receiver: AddressLike,
       id: BigNumberish,
-      amount: BigNumberish
+      _amount: BigNumberish
     ],
     [boolean],
     "nonpayable"
@@ -970,7 +970,7 @@ export interface LendingPoolManager extends BaseContract {
       currency: AddressLike,
       amount: BigNumberish
     ],
-    [void],
+    [bigint],
     "nonpayable"
   >;
 
@@ -998,7 +998,7 @@ export interface LendingPoolManager extends BaseContract {
   getFunction(
     nameOrSignature: "approve"
   ): TypedContractMethod<
-    [spender: AddressLike, id: BigNumberish, amount: BigNumberish],
+    [spender: AddressLike, id: BigNumberish, _amount: BigNumberish],
     [boolean],
     "nonpayable"
   >;
@@ -1114,7 +1114,7 @@ export interface LendingPoolManager extends BaseContract {
       currency: AddressLike,
       amount: BigNumberish
     ],
-    [void],
+    [bigint],
     "nonpayable"
   >;
   getFunction(
@@ -1214,7 +1214,7 @@ export interface LendingPoolManager extends BaseContract {
   getFunction(
     nameOrSignature: "transfer"
   ): TypedContractMethod<
-    [receiver: AddressLike, id: BigNumberish, amount: BigNumberish],
+    [receiver: AddressLike, id: BigNumberish, _amount: BigNumberish],
     [boolean],
     "nonpayable"
   >;
@@ -1225,7 +1225,7 @@ export interface LendingPoolManager extends BaseContract {
       sender: AddressLike,
       receiver: AddressLike,
       id: BigNumberish,
-      amount: BigNumberish
+      _amount: BigNumberish
     ],
     [boolean],
     "nonpayable"
@@ -1264,7 +1264,7 @@ export interface LendingPoolManager extends BaseContract {
       currency: AddressLike,
       amount: BigNumberish
     ],
-    [void],
+    [bigint],
     "nonpayable"
   >;
 

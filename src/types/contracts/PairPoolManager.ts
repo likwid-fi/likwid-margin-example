@@ -30,7 +30,7 @@ export type AddLiquidityParamsStruct = {
   amount0Min: BigNumberish;
   amount1Min: BigNumberish;
   level: BigNumberish;
-  to: AddressLike;
+  source: AddressLike;
   deadline: BigNumberish;
 };
 
@@ -41,7 +41,7 @@ export type AddLiquidityParamsStructOutput = [
   amount0Min: bigint,
   amount1Min: bigint,
   level: bigint,
-  to: string,
+  source: string,
   deadline: bigint
 ] & {
   poolId: string;
@@ -50,7 +50,7 @@ export type AddLiquidityParamsStructOutput = [
   amount0Min: bigint;
   amount1Min: bigint;
   level: bigint;
-  to: string;
+  source: string;
   deadline: bigint;
 };
 
@@ -643,8 +643,8 @@ export namespace InitializeEvent {
 export namespace MintEvent {
   export type InputTuple = [
     poolId: BytesLike,
+    source: AddressLike,
     sender: AddressLike,
-    to: AddressLike,
     liquidity: BigNumberish,
     amount0: BigNumberish,
     amount1: BigNumberish,
@@ -652,8 +652,8 @@ export namespace MintEvent {
   ];
   export type OutputTuple = [
     poolId: string,
+    source: string,
     sender: string,
-    to: string,
     liquidity: bigint,
     amount0: bigint,
     amount1: bigint,
@@ -661,8 +661,8 @@ export namespace MintEvent {
   ];
   export interface OutputObject {
     poolId: string;
+    source: string;
     sender: string;
-    to: string;
     liquidity: bigint;
     amount0: bigint;
     amount1: bigint;

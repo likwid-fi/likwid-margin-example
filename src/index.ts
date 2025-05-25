@@ -125,7 +125,7 @@ async function main() {
     amount0Min: (amount0In * 995n) / 1000n,
     amount1Min: (amount1In * 995n) / 1000n,
     level: 4,
-    to: user,
+    source: user,
     deadline: Math.floor(Date.now() / 1000) + 100,
   };
   // approve token

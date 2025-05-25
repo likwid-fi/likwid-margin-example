@@ -122,7 +122,6 @@ export interface MarginLiquidityInterface extends Interface {
       | "getPoolLiquidity"
       | "getPoolSupplies"
       | "getSupplies"
-      | "increaseStore"
       | "interestOperator"
       | "interestStore0"
       | "interestStore1"
@@ -157,7 +156,7 @@ export interface MarginLiquidityInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "addLiquidity",
-    values: [AddressLike, AddressLike, BigNumberish, BigNumberish, BigNumberish]
+    values: [AddressLike, BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "addPoolManager",
@@ -234,10 +233,6 @@ export interface MarginLiquidityInterface extends Interface {
   encodeFunctionData(
     functionFragment: "getSupplies",
     values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "increaseStore",
-    values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "interestOperator",
@@ -367,10 +362,6 @@ export interface MarginLiquidityInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getSupplies",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "increaseStore",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -573,8 +564,7 @@ export interface MarginLiquidity extends BaseContract {
 
   addLiquidity: TypedContractMethod<
     [
-      caller: AddressLike,
-      receiver: AddressLike,
+      sender: AddressLike,
       id: BigNumberish,
       level: BigNumberish,
       amount: BigNumberish
@@ -721,12 +711,6 @@ export interface MarginLiquidity extends BaseContract {
     "view"
   >;
 
-  increaseStore: TypedContractMethod<
-    [arg0: AddressLike, arg1: BigNumberish],
-    [bigint],
-    "view"
-  >;
-
   interestOperator: TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
 
   interestStore0: TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
@@ -821,8 +805,7 @@ export interface MarginLiquidity extends BaseContract {
     nameOrSignature: "addLiquidity"
   ): TypedContractMethod<
     [
-      caller: AddressLike,
-      receiver: AddressLike,
+      sender: AddressLike,
       id: BigNumberish,
       level: BigNumberish,
       amount: BigNumberish
@@ -981,13 +964,6 @@ export interface MarginLiquidity extends BaseContract {
         retainSupply1: bigint;
       }
     ],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "increaseStore"
-  ): TypedContractMethod<
-    [arg0: AddressLike, arg1: BigNumberish],
-    [bigint],
     "view"
   >;
   getFunction(
